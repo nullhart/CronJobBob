@@ -22,6 +22,7 @@
           <button
             type="button"
             class="nes-btn is-normal"
+      
             @click="openDialog('dialog-' + index)"
           >Edit</button>
           <dialog class="nes-dialog" :id="'dialog-' + index">
@@ -50,12 +51,14 @@
 import "./prism";
 import "./prism.css";
 import Prism from "vue-prism-component";
+import dialogPolyfill from "../node_modules/dialog-polyfill/dist/dialog-polyfill";
 
 export default {
   name: "app",
   components: { Prism },
   data() {
     return {
+
       tasks: [
         {
           name: "Return Num",
@@ -82,25 +85,32 @@ export default {
     };
   },
   methods: {
+          isMobile: () => {return document.body.clientWidth  > 800},
     format: function(code) {
       var code = prettier.format(code, {
         parser: "babylon",
         plugins: prettierPlugins
       });
-      console.log(code);
+      // console.log(code);
       return code;
     },
     openDialog: function(element) {
       document.getElementById(element).showModal();
     }
   },
-  watch: {
-    tasks: function() {
-      this.tasks;
-      console.log(this.tasks);
-    }
+
+  mounted() {
+    //Pollyfill Dialog
+    var dialog = document.querySelectorAll("dialog");
+    dialog.forEach(node => {
+      dialogPolyfill.registerDialog(node);
+    });
+
+    console.log(this.isMobile());
   },
   created() {
+
+    //
     this.tasks.forEach(task => {
       try {
         task.command = this.format(task.command);
@@ -114,6 +124,24 @@ export default {
 
 <style lang="scss">
 @import "../node_modules/nes.css/css/nes.css";
+@import url("../node_modules/dialog-polyfill/dist/dialog-polyfill.css");
+
+dialog::backdrop {
+  /* native */
+  background-color: rgb(0, 0, 0, 30%);
+    backdrop-filter: blur(10px);
+}
+dialog + .backdrop {
+  /* polyfill */
+  background-color: rgb(0, 0, 0, 30%);
+  backdrop-filter: blur(10px);
+}
+dialog {
+  position: fixed;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 80vw;
+}
 
 .underline {
   text-decoration: underline;
@@ -131,23 +159,23 @@ export default {
 }
 
 .taskCard {
+
   display: grid;
   justify-self: center;
   width: 350px;
   height: 250px;
 
-  min-width: 350px;
-  min-height: 250px;
 
   max-width: 350px;
   max-height: 250px;
-
   border-radius: 15px;
   grid-template-rows: 45px 1fr 55px;
   grid-template-areas:
     "a a"
     "b b"
     "c d ";
+
+
 }
 
 body {
