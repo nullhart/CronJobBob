@@ -8,62 +8,27 @@
     <div class="content-container">
       <div class="task-container">
         <!-- TODO: add list of all tasks -->
-
-        <div
-          v-for="(task, index) in tasks"
-          :key="index"
-          class="taskCard nes-container is-rounded is-dark"
-        >
-          <span style="grid-area:a">
-            <h3>{{task.name}}</h3>
-          </span>
-          <span style="grid-area:b" class="taskDescription">{{task.description}}</span>
-          <button style="grid-area:c;" class="nes-btn is-success">Run</button>
-          <button
-            type="button"
-            class="nes-btn is-normal"
-      
-            @click="openDialog('dialog-' + index)"
-          >Edit</button>
-          <dialog class="nes-dialog" :id="'dialog-' + index">
-            <form method="dialog">
-              <p class="title">
-                <span class="underline">Name</span>:
-                <span>{{task.name}}</span>
-              </p>
-              <p>
-                <span class="taskDescriptionDetails">{{task.description}}</span>
-              </p>
-              <prism language="js" style="background-color: #272822">{{task.command}}</prism>
-              <menu class="dialog-menu">
-                <button class="nes-btn">Cancel</button>
-                <button class="nes-btn is-primary">Confirm</button>
-              </menu>
-            </form>
-          </dialog>
-        </div>
+        <template v-for="(tasks,index) in this.tasks">
+          <RetroCard :data="tasks" :index="index" :key="index" />
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import "./prism";
-import "./prism.css";
-import Prism from "vue-prism-component";
-import dialogPolyfill from "../node_modules/dialog-polyfill/dist/dialog-polyfill";
-
+import RetroCard from "./components/RetroCard";
 export default {
   name: "app",
-  components: { Prism },
+  components: { Prism, RetroCard },
   data() {
     return {
-
       tasks: [
         {
           name: "Return Num",
-          command: "var test= 2; le hello =2",
+          command: "var test= 2; let hello =2",
           description: `This is an example cron job to do a job that is good`,
+          lastRan: "Thu Dec 05 2019 12:36:35 GMT-0700 (Mountain Standard Time)",
           enabled: "true",
           id: 1
         },
@@ -71,6 +36,7 @@ export default {
           name: "Run PI",
           command: "var test = 2",
           description: `This is an example cron job to do a job that is good`,
+          lastRan: "Thu Dec 05 2019 12:36:35 GMT-0700 (Mountain Standard Time)",
           enabled: false,
           id: 2
         },
@@ -78,109 +44,32 @@ export default {
           name: "test",
           command: "var test = 200",
           description: `This is an example cron job to do a job that is good`,
+          lastRan: "Thu Dec 05 2019 12:36:35 GMT-0700 (Mountain Standard Time)",
           enabled: true,
           id: 3
         }
       ]
     };
   },
-  methods: {
-          isMobile: () => {return document.body.clientWidth  > 800},
-    format: function(code) {
-      var code = prettier.format(code, {
-        parser: "babylon",
-        plugins: prettierPlugins
-      });
-      // console.log(code);
-      return code;
-    },
-    openDialog: function(element) {
-      document.getElementById(element).showModal();
-    }
-  },
+  methods: {},
 
-  mounted() {
-    //Pollyfill Dialog
-    var dialog = document.querySelectorAll("dialog");
-    dialog.forEach(node => {
-      dialogPolyfill.registerDialog(node);
-    });
-
-    console.log(this.isMobile());
-  },
-  created() {
-
-    //
-    this.tasks.forEach(task => {
-      try {
-        task.command = this.format(task.command);
-      } catch (error) {
-        task.command = error;
-      }
-    });
-  }
+  mounted() {},
+  created() {}
 };
 </script>
 
 <style lang="scss">
 @import "../node_modules/nes.css/css/nes.css";
-@import url("../node_modules/dialog-polyfill/dist/dialog-polyfill.css");
 
-dialog::backdrop {
-  /* native */
-  background-color: rgb(0, 0, 0, 30%);
-    backdrop-filter: blur(10px);
-}
-dialog + .backdrop {
-  /* polyfill */
-  background-color: rgb(0, 0, 0, 30%);
-  backdrop-filter: blur(10px);
-}
-dialog {
-  position: fixed;
-  top: 50%;
-  transform: translate(0, -50%);
-  width: 80vw;
-}
-
-.underline {
-  text-decoration: underline;
-}
-
-.taskDescriptionDetails {
-  font-size: 0.8em;
-  color: gray;
+body {
+  margin: 0px;
+  font-family: "Press Start 2P", cursive;
 }
 
 .content-container {
   display: flex;
   max-width: 1200px;
   margin: auto;
-}
-
-.taskCard {
-
-  display: grid;
-  justify-self: center;
-  width: 350px;
-  height: 250px;
-
-
-  max-width: 350px;
-  max-height: 250px;
-  border-radius: 15px;
-  grid-template-rows: 45px 1fr 55px;
-  grid-template-areas:
-    "a a"
-    "b b"
-    "c d ";
-
-
-}
-
-body {
-  margin: 0px;
-  font-family: "Press Start 2P", cursive;
 }
 
 .main {
@@ -204,10 +93,6 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   width: 100vw;
   grid-gap: 0px;
-}
-
-.list-divider {
-  border-top: 1px solid black;
 }
 
 .task-header {
